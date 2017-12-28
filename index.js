@@ -1,9 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
-require('./services/passport');
 const authRoutes = require('./routes/authRoutes');
 const keys = require('./config/keys');
 
+// passport.js will use./models/User, therefor we will need to require(models/User) 1st, then require passport
+require('./models/User');
+require('./services/passport');
 
 const app = express();
 
