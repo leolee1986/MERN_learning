@@ -6,6 +6,20 @@ const mongoose = require('mongoose');
 // instead of require User.js which might casue an error, use this instead
 const User = mongoose.model('users');
 
+// use passport.serializeUser to create a token for the cookie
+passport.serializeUser((user, done) => {
+  // this user.id is the _id in the MongoDB
+  done(null, user.id);
+});
+
+// deserializeUser
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then(user => {
+      done(null, user);
+    });
+});
+
 // setup google oauth
 passport.use(new GoogleStrategy({
   clientID: keys.googleClientID,
@@ -18,11 +32,12 @@ passport.use(new GoogleStrategy({
     .then((existingUser) => {
       if (existingUser) {
         // the user exist
+        done(null, existingUser);
       } else {
         // crate a new User, then save it in the database
-        new User({
-          googleId: profile.id
-        }).save();
+        new User({ googleId: profile.id })
+          .save()
+          .then(user => done(unll, user));
       }
     });
 
